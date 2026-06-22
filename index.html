@@ -220,23 +220,22 @@
   const GHK ={key:"ghk", name:"GHK-Cu",accent:"pm",units:"8u",meta:"2mg = 0.2mL · standalone"};
 
   // ----- date-based ramps -----
-  function ymd(d){ return d.toISOString().slice(0,10); }
 
-  // NAD+ ramp: start Mon Jun 22 2026, two weeks per step
-  const NAD_START = new Date("2026-06-22T00:00:00");
+  // NAD+ ramp: start Mon Jun 22 2026, two weeks per step (applies M/W/F all week)
+  const NAD_START = new Date(2026, 5, 22);  // local midnight, Jun 22 (month is 0-indexed)
   function nadCard(dt){
-    const days = Math.floor((dt - NAD_START)/86400000);
+    const days = Math.round((dt - NAD_START)/86400000);
     let dose, units, phase;
     if(days < 0)        { dose="25mg"; units="15u"; phase="starts Jun 22"; }
-    else if(days < 14)  { dose="25mg"; units="15u"; phase="wk 1–2"; }      // Jun 22 – Jul 5
-    else if(days < 28)  { dose="50mg"; units="30u"; phase="wk 3–4"; }      // Jul 6 – Jul 19
-    else                { dose="100mg"; units="58u"; phase="wk 5+"; }       // Jul 20+
+    else if(days < 14)  { dose="25mg"; units="15u"; phase="Jun 22–Jul 5"; }   // step 1
+    else if(days < 28)  { dose="50mg"; units="30u"; phase="Jul 6–19"; }        // step 2
+    else                { dose="100mg"; units="58u"; phase="Jul 20+"; }        // step 3
     return {key:"nad",name:"NAD+",accent:"nad",units:units,
       meta:`${dose} · slow push · ${phase}`,tag:"exp"};
   }
 
-  // Reta step: 1mg now → 1.5mg from Wed Jul 1 2026
-  const RETA_STEP = new Date("2026-07-01T00:00:00");
+  // Reta step: 1mg now → 1.5mg from Wed Jul 1 2026 (Wednesdays)
+  const RETA_STEP = new Date(2026, 6, 1);  // local midnight, Jul 1
   function retaCard(dt){
     let dose, units;
     if(dt < RETA_STEP){ dose="1mg"; units="20u"; }
@@ -267,14 +266,21 @@
     d.setDate(d.getDate()+diff);
     return d;
   }
-  function storeKey(idx){ return "stack_"+dateForIdx(idx).toISOString().slice(0,10); }
+  // local YYYY-MM-DD (avoids UTC day-shift from toISOString)
+  function localYMD(d){
+    const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,"0"), dy=String(d.getDate()).padStart(2,"0");
+    return `${y}-${m}-${dy}`;
+  }
+  function storeKey(idx){ return "stack_"+localYMD(dateForIdx(idx)); }
   function load(idx){ try{return JSON.parse(localStorage.getItem(storeKey(idx))||"{}");}catch(e){return {};} }
   function saveState(idx,st){ try{localStorage.setItem(storeKey(idx),JSON.stringify(st));}catch(e){} }
 
   // cleanup keys older than ~120 days (keeps ~4 months of history for tracking)
-  try{ const cutoff=new Date(); cutoff.setDate(cutoff.getDate()-120);
+  try{ const cutoff=new Date(); cutoff.setHours(0,0,0,0); cutoff.setDate(cutoff.getDate()-120);
     for(let i=localStorage.length-1;i>=0;i--){ const k=localStorage.key(i);
-      if(k&&k.startsWith("stack_")){ const ds=k.slice(6); if(new Date(ds)<cutoff) localStorage.removeItem(k); } }
+      if(k&&k.startsWith("stack_")){ const p=k.slice(6).split("-");
+        const kd=new Date(+p[0], +p[1]-1, +p[2]);
+        if(kd<cutoff) localStorage.removeItem(k); } }
   }catch(e){}
 
   let state={};
