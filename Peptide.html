@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Stack">
+<meta name="theme-color" content="#0e1116">
+<title>Stack</title>
+<style>
+  :root {
+    --bg:#0e1116; --surface:#161b22; --surface-2:#1c232c; --line:#283039;
+    --text:#e8eaed; --muted:#8b949e;
+    --am:#d98c4a; --pm:#5a8ca8; --reta:#b07cc6; --nad:#6fae7d; --done:#4a5560; --ring:#2f3a45;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;}
+  html,body{margin:0;background:var(--bg);color:var(--text);
+    font-family:ui-sans-serif,-apple-system,"SF Pro Text",system-ui,sans-serif;line-height:1.4;}
+  body{padding:env(safe-area-inset-top) 0 calc(env(safe-area-inset-bottom) + 90px);}
+
+  header{padding:20px 20px 12px;position:sticky;top:0;z-index:20;
+    background:linear-gradient(180deg,var(--bg) 72%,transparent);backdrop-filter:blur(8px);}
+  .title-row{display:flex;align-items:baseline;justify-content:space-between;}
+  h1{font-size:25px;font-weight:700;letter-spacing:-.02em;margin:0;}
+  .date{font-size:12px;color:var(--muted);}
+
+  /* week nav */
+  .weeknav{display:flex;align-items:center;gap:8px;padding:4px 14px 2px;}
+  .wk-arrow{width:38px;height:38px;flex:none;border-radius:11px;background:var(--surface);
+    border:1px solid var(--line);color:var(--text);font-size:20px;line-height:1;cursor:pointer;
+    display:grid;place-items:center;transition:background .12s;}
+  .wk-arrow:active{background:var(--surface-2);}
+  .wk-center{flex:1;background:none;border:none;color:var(--muted);font-size:12.5px;font-weight:600;
+    letter-spacing:.02em;cursor:pointer;padding:8px 0;text-align:center;}
+
+  /* day selector */
+  .days{display:flex;gap:6px;padding:6px 14px 10px;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .days::-webkit-scrollbar{display:none;}
+  .day-pill{flex:none;min-width:44px;text-align:center;padding:9px 0;border-radius:12px;
+    background:var(--surface);border:1px solid var(--line);cursor:pointer;transition:all .12s;}
+  .day-pill .dn{font-size:11px;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;}
+  .day-pill .num{font-size:15px;font-weight:600;margin-top:2px;}
+  .day-pill.active{background:var(--nad);border-color:var(--nad);}
+  .day-pill.active .dn,.day-pill.active .num{color:#0e1116;}
+  .day-pill.is-today:not(.active){border-color:var(--nad);}
+
+  .progress{margin:0 20px;height:4px;background:var(--surface-2);border-radius:999px;overflow:hidden;}
+  .progress>div{height:100%;width:0;background:var(--nad);border-radius:999px;transition:width .25s;}
+  .plabel{font-size:11px;color:var(--muted);margin:6px 20px 0;letter-spacing:.03em;}
+
+  .legend{display:flex;gap:13px;flex-wrap:wrap;padding:12px 20px 2px;font-size:11px;color:var(--muted);}
+  .legend span{display:inline-flex;align-items:center;gap:5px;}
+  .dot{width:8px;height:8px;border-radius:50%;display:inline-block;}
+  .dot.am{background:var(--am);}.dot.pm{background:var(--pm);}
+  .dot.reta{background:var(--reta);}.dot.nad{background:var(--nad);}
+
+  .slot-head{display:flex;align-items:center;gap:8px;padding:18px 20px 6px;
+    font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);}
+  .slot-head .line{flex:1;height:1px;background:var(--line);}
+
+  .shot{display:flex;align-items:center;gap:13px;margin:8px 14px;padding:14px 15px;
+    background:var(--surface);border:1px solid var(--line);border-radius:14px;cursor:pointer;
+    user-select:none;transition:background .12s,opacity .12s,transform .08s;}
+  .shot:active{transform:scale(.985);}
+  .shot.checked{opacity:.45;background:var(--surface-2);}
+  .shot .accent{width:4px;height:38px;border-radius:4px;flex:none;}
+  .accent.am{background:var(--am);}.accent.pm{background:var(--pm);}
+  .accent.reta{background:var(--reta);}.accent.nad{background:var(--nad);}
+  .shot .body{flex:1;min-width:0;}
+  .shot .name{font-size:16px;font-weight:600;letter-spacing:-.01em;}
+  .shot.checked .name{text-decoration:line-through;color:var(--done);}
+  .shot .meta{font-size:12px;color:var(--muted);margin-top:2px;}
+  .shot .units{font-size:13px;font-weight:600;background:var(--surface-2);
+    border:1px solid var(--line);border-radius:8px;padding:4px 9px;flex:none;white-space:nowrap;}
+  .shot.checked .units{color:var(--done);}
+  .check{width:24px;height:24px;border-radius:8px;border:1.5px solid var(--ring);flex:none;
+    display:grid;place-items:center;font-size:14px;color:var(--bg);background:transparent;transition:all .12s;}
+  .shot.checked .check{background:var(--nad);border-color:var(--nad);}
+  .tag{font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;
+    padding:2px 7px;border-radius:6px;margin-left:7px;vertical-align:middle;}
+  .tag.anchor{color:var(--reta);border:1px solid var(--reta);}
+  .tag.exp{color:var(--nad);border:1px solid var(--nad);}
+
+  .note{margin:14px 18px 0;padding:13px 15px;background:var(--surface);
+    border:1px solid var(--line);border-left:3px solid var(--am);border-radius:10px;
+    font-size:12.5px;color:var(--muted);}
+  .note b{color:var(--text);font-weight:600;}
+
+  /* info page */
+  .page{display:none;}
+  .page.active{display:block;}
+  .info-sec{margin:18px 14px 0;}
+  .info-sec h2{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);
+    padding:0 6px 10px;margin:0;}
+  .info-card{background:var(--surface);border:1px solid var(--line);border-radius:12px;
+    padding:14px 15px;margin-bottom:8px;}
+  .info-card .nm{font-size:15px;font-weight:600;}
+  .info-card .recon{font-size:12.5px;color:var(--nad);margin-top:3px;}
+  .info-card .det{font-size:12.5px;color:var(--muted);margin-top:5px;line-height:1.5;}
+  .info-card.hold{opacity:.6;}
+  .info-card.hold .recon{color:var(--muted);font-style:italic;}
+  .tip{margin:8px 14px 0;padding:13px 15px;background:var(--surface);border:1px solid var(--line);
+    border-radius:12px;font-size:13px;color:var(--muted);line-height:1.55;}
+  .tip b{color:var(--text);font-weight:600;}
+  .tip+.tip{margin-top:8px;}
+
+  /* bottom nav */
+  .nav{position:fixed;bottom:0;left:0;right:0;display:flex;
+    background:var(--surface);border-top:1px solid var(--line);
+    padding:8px 0 calc(env(safe-area-inset-bottom) + 8px);z-index:30;}
+  .nav button{flex:1;background:none;border:none;color:var(--muted);font-size:11px;
+    display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;font-weight:600;letter-spacing:.02em;}
+  .nav button.active{color:var(--nad);}
+  .nav .ic{font-size:19px;line-height:1;}
+
+  .reset{display:block;margin:22px auto 0;padding:10px 20px;font-size:12px;
+    background:none;border:1px solid var(--line);border-radius:999px;color:var(--muted);cursor:pointer;}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;}}
+</style>
+</head>
+<body>
+
+<!-- TRACKER PAGE -->
+<div class="page active" id="page-track">
+  <header>
+    <div class="title-row"><h1>Stack</h1><span class="date" id="date"></span></div>
+  </header>
+  <div class="weeknav">
+    <button class="wk-arrow" onclick="shiftWeek(-1)" aria-label="Previous week">‹</button>
+    <button class="wk-center" id="weeklabel" onclick="goToday()">This week</button>
+    <button class="wk-arrow" onclick="shiftWeek(1)" aria-label="Next week">›</button>
+  </div>
+  <div class="days" id="days"></div>
+  <div class="progress"><div id="bar"></div></div>
+  <div class="plabel" id="plabel">0 of 0 done</div>
+  <div class="legend">
+    <span><i class="dot am"></i>Morning</span>
+    <span><i class="dot pm"></i>Evening</span>
+    <span><i class="dot nad"></i>NAD+ test</span>
+    <span><i class="dot reta"></i>Weekly</span>
+  </div>
+  <div id="list"></div>
+  <div class="note" id="nadnote"></div>
+  <button class="reset" onclick="resetDay()">Reset this day</button>
+</div>
+
+<!-- INFO PAGE -->
+<div class="page" id="page-info">
+  <header><div class="title-row"><h1>Protocol</h1><span class="date">reference</span></div></header>
+
+  <div class="info-sec">
+    <h2>Active — reconstituted</h2>
+    <div class="info-card">
+      <div class="nm">MOTS-C</div>
+      <div class="recon">1mL BacWater → 10mg/mL</div>
+      <div class="det">5mg = 0.5mL = <b>50 units</b> · M/W/F mornings, fasted or light food. SubQ abdomen.</div>
+    </div>
+    <div class="info-card">
+      <div class="nm">Cartalax / TB-4 / BPC-157</div>
+      <div class="recon">2mL BacWater → 20mg/mL blend</div>
+      <div class="det">~500mcg BPC = 0.1mL = <b>10 units</b> · daily AM. 4–6 week healing block then reassess. Replaces standalone BPC.</div>
+    </div>
+    <div class="info-card">
+      <div class="nm">NAD+ <span class="tag exp" style="border:1px solid var(--nad);color:var(--nad)">test</span></div>
+      <div class="recon">3mL BacWater → 172mg/mL</div>
+      <div class="det">Ramp (2 wks per step): Jun 22–Jul 5 25mg = <b>15u</b> · Jul 6–19 50mg = <b>30u</b> · Jul 20+ 100mg = <b>58u</b>. AM on M/W/F (alongside MOTS-C). Slow 60–90s push, hydrate first, rotate sites. n=1 experiment — track HRV/recovery.</div>
+    </div>
+    <div class="info-card">
+      <div class="nm">CJC-1295 / Ipamorelin</div>
+      <div class="recon">2mL BacWater → 2.5mg + 2.5mg/mL</div>
+      <div class="det">125mcg each = 0.05mL = <b>5 units</b> · nightly pre-bed, fasted (~2hr after eating). Tiny draw — pull slowly.</div>
+    </div>
+    <div class="info-card">
+      <div class="nm">GHK-Cu <span class="tag" style="border:1px solid var(--am);color:var(--am)">cycle</span></div>
+      <div class="recon">standalone vial (finishing)</div>
+      <div class="det">2mg = <b>8 units</b> · nightly. Build in a break rather than running indefinitely — copper/zinc balance. Cycle alongside the Cartalax block then pause.</div>
+    </div>
+    <div class="info-card">
+      <div class="nm">Retatrutide <span class="tag anchor">weekly</span></div>
+      <div class="recon">finishing Eternal Peptides vial</div>
+      <div class="det">1mg = <b>20u</b> now (Eternal vial), Wednesday nights. Steps to 1.5mg = <b>30u</b> from Wed Jul 1. On ION 10mg vial: 2mL → 5mg/mL. (1mg = 20u, not the old 40u from the 5mg vial.) Hold 1.5mg before considering 2mg.</div>
+    </div>
+  </div>
+
+  <div class="info-sec">
+    <h2>Queued — open when current finishes</h2>
+    <div class="info-card hold">
+      <div class="nm">ION-3R (Retatrutide)</div>
+      <div class="recon">2mL → 5mg/mL · 1mg = 20u</div>
+      <div class="det">Open when the Eternal Reta vial is done.</div>
+    </div>
+    <div class="info-card hold">
+      <div class="nm">GHK-Cu / KPV blend (60mg)</div>
+      <div class="recon">3mL → 20mg/mL (~10mg ea/mL)</div>
+      <div class="det">~2mg each = 0.2mL = 20u. Open when standalone GHK-Cu finishes. Decide on nightly KPV before committing.</div>
+    </div>
+  </div>
+
+  <div class="info-sec">
+    <h2>Technique &amp; notes</h2>
+    <div class="tip"><b>Universal recon:</b> swab stopper, inject water slowly down the glass wall (not onto the powder), swirl gently — never shake — refrigerate once dissolved.</div>
+    <div class="tip"><b>NAD+ first pin:</b> 15u only. Normal flush/warmth fades in a couple minutes. Anything escalating — spreading hives, breathing changes — stop. Small first dose given prior batch-reaction history.</div>
+    <div class="tip"><b>Site rotation:</b> clockwise around the navel for all SubQ. Mon/Wed/Fri mornings are three pins (MOTS-C + Cartalax + NAD+) — spread them out, don't rush the NAD+ push.</div>
+    <div class="tip"><b>Wednesday</b> is the heavy day: AM stack plus Reta + CJC/IPA + GHK in the evening.</div>
+    <div class="tip"><b>GH timing:</b> CJC/IPA works best fasted, ~2hr after eating and 30min before. The fasted window matters more than the clock time.</div>
+  </div>
+</div>
+
+<!-- NAV -->
+<div class="nav">
+  <button id="nav-track" class="active" onclick="showPage('track')"><span class="ic">◉</span>Today</button>
+  <button id="nav-info" onclick="showPage('info')"><span class="ic">≡</span>Protocol</button>
+</div>
+
+<script>
+  const MOTS={key:"mots",name:"MOTS-C",accent:"am",units:"50u",meta:"5mg = 0.5mL · 10mg/mL · fasted"};
+  const CART={key:"cart",name:"Cartalax blend",accent:"am",units:"10u",meta:"~500mcg BPC = 0.1mL · daily"};
+  const CJC ={key:"cjc", name:"CJC / IPA",accent:"pm",units:"5u",meta:"125mcg ea = 0.05mL · fasted"};
+  const GHK ={key:"ghk", name:"GHK-Cu",accent:"pm",units:"8u",meta:"2mg = 0.2mL · standalone"};
+
+  // ----- date-based ramps -----
+  function ymd(d){ return d.toISOString().slice(0,10); }
+
+  // NAD+ ramp: start Mon Jun 22 2026, two weeks per step
+  const NAD_START = new Date("2026-06-22T00:00:00");
+  function nadCard(dt){
+    const days = Math.floor((dt - NAD_START)/86400000);
+    let dose, units, phase;
+    if(days < 0)        { dose="25mg"; units="15u"; phase="starts Jun 22"; }
+    else if(days < 14)  { dose="25mg"; units="15u"; phase="wk 1–2"; }      // Jun 22 – Jul 5
+    else if(days < 28)  { dose="50mg"; units="30u"; phase="wk 3–4"; }      // Jul 6 – Jul 19
+    else                { dose="100mg"; units="58u"; phase="wk 5+"; }       // Jul 20+
+    return {key:"nad",name:"NAD+",accent:"nad",units:units,
+      meta:`${dose} · slow push · ${phase}`,tag:"exp"};
+  }
+
+  // Reta step: 1mg now → 1.5mg from Wed Jul 1 2026
+  const RETA_STEP = new Date("2026-07-01T00:00:00");
+  function retaCard(dt){
+    let dose, units;
+    if(dt < RETA_STEP){ dose="1mg"; units="20u"; }
+    else             { dose="1.5mg"; units="30u"; }
+    return {key:"reta",name:"Retatrutide",accent:"reta",units:units,
+      meta:`${dose} · Wed PM · units = ION 5mg/mL`,tag:"anchor"};
+  }
+
+  function buildDay(idx){
+    const isMWF=(idx===0||idx===2||idx===4), isWed=(idx===2);
+    const dt=dateForIdx(idx);
+    const am=[]; if(isMWF){ am.push(MOTS); } am.push(CART);
+    if(isMWF){ am.push(nadCard(dt)); }
+    const pm=[]; if(isWed) pm.push(retaCard(dt)); pm.push(CJC,GHK);
+    return {am,pm};
+  }
+
+  const dayNames=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+  const dayAbbr=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+  const todayIdx=(new Date().getDay()+6)%7;
+  let viewIdx=todayIdx;
+  let weekOffset=0;   // 0 = this week, -1 = last week, +1 = next week
+
+  // date for a given day index, factoring in the week offset
+  function dateForIdx(idx){
+    const d=new Date(); d.setHours(0,0,0,0);
+    const diff=(idx-todayIdx)+(weekOffset*7);
+    d.setDate(d.getDate()+diff);
+    return d;
+  }
+  function storeKey(idx){ return "stack_"+dateForIdx(idx).toISOString().slice(0,10); }
+  function load(idx){ try{return JSON.parse(localStorage.getItem(storeKey(idx))||"{}");}catch(e){return {};} }
+  function saveState(idx,st){ try{localStorage.setItem(storeKey(idx),JSON.stringify(st));}catch(e){} }
+
+  // cleanup keys older than ~120 days (keeps ~4 months of history for tracking)
+  try{ const cutoff=new Date(); cutoff.setDate(cutoff.getDate()-120);
+    for(let i=localStorage.length-1;i>=0;i--){ const k=localStorage.key(i);
+      if(k&&k.startsWith("stack_")){ const ds=k.slice(6); if(new Date(ds)<cutoff) localStorage.removeItem(k); } }
+  }catch(e){}
+
+  let state={};
+  function weekLabel(){
+    const mon=dateForIdx(0), sun=dateForIdx(6);
+    const opt={month:"short",day:"numeric"};
+    let lbl=mon.toLocaleDateString(undefined,opt)+" – "+sun.toLocaleDateString(undefined,opt);
+    if(weekOffset===0) lbl="This week · "+lbl;
+    else if(weekOffset===-1) lbl="Last week · "+lbl;
+    else if(weekOffset===1) lbl="Next week · "+lbl;
+    return lbl;
+  }
+  function shiftWeek(dir){
+    weekOffset+=dir;
+    // when changing weeks, default selection to Monday (or today if back on this week)
+    viewIdx = (weekOffset===0) ? todayIdx : 0;
+    state=load(viewIdx); renderWeek(); renderDays(); renderList();
+  }
+  function goToday(){
+    if(weekOffset===0 && viewIdx===todayIdx) return;
+    weekOffset=0; viewIdx=todayIdx;
+    state=load(viewIdx); renderWeek(); renderDays(); renderList();
+  }
+  function renderWeek(){
+    document.getElementById("weeklabel").textContent=weekLabel();
+  }
+  function renderDays(){
+    const wrap=document.getElementById("days"); wrap.innerHTML="";
+    for(let i=0;i<7;i++){
+      const d=document.createElement("div");
+      const isToday=(i===todayIdx && weekOffset===0);
+      d.className="day-pill"+(i===viewIdx?" active":"")+(isToday?" is-today":"");
+      const dt=dateForIdx(i);
+      d.innerHTML=`<div class="dn">${dayAbbr[i]}</div><div class="num">${dt.getDate()}</div>`;
+      d.onclick=()=>{viewIdx=i;state=load(viewIdx);renderDays();renderList();};
+      wrap.appendChild(d);
+    }
+  }
+
+  let total=0;
+  function shotEl(item,slot){
+    const id=slot+"_"+item.key;
+    const el=document.createElement("div");
+    el.className="shot"+(state[id]?" checked":"");
+    el.innerHTML=`<span class="accent ${item.accent}"></span>`+
+      `<div class="body"><div class="name">${item.name}`+
+      (item.tag?`<span class="tag ${item.tag}">${item.tag==="anchor"?"weekly":"test"}</span>`:``)+
+      `</div><div class="meta">${item.meta}</div></div>`+
+      `<span class="units">${item.units}</span>`+
+      `<span class="check">${state[id]?"✓":""}</span>`;
+    el.onclick=()=>{ state[id]=!state[id]; saveState(viewIdx,state);
+      el.classList.toggle("checked"); el.querySelector(".check").textContent=state[id]?"✓":""; updateProgress(); };
+    return el;
+  }
+
+  function renderList(){
+    const dt=dateForIdx(viewIdx);
+    const isToday=(viewIdx===todayIdx && weekOffset===0);
+    document.getElementById("date").textContent=
+      dayNames[viewIdx]+" · "+dt.toLocaleDateString(undefined,{month:"short",day:"numeric"})+(isToday?" · today":"");
+    const day=buildDay(viewIdx);
+    const wrap=document.getElementById("list"); wrap.innerHTML=""; total=0;
+    [["Morning","am",day.am],["Evening","pm",day.pm]].forEach(([label,slot,arr])=>{
+      const h=document.createElement("div"); h.className="slot-head";
+      h.innerHTML=`${label}<span class="line"></span>`; wrap.appendChild(h);
+      arr.forEach(it=>{wrap.appendChild(shotEl(it,slot));total++;});
+    });
+    document.getElementById("nadnote").innerHTML=
+      `<b>NAD+ ramp (2 wks each):</b> Jun 22–Jul 5 → 15u (25mg) · Jul 6–19 → 30u (50mg) · Jul 20+ → 58u (100mg). Slow push, hydrate, watch each step-up.`;
+    updateProgress();
+  }
+
+  function updateProgress(){
+    const day=buildDay(viewIdx);
+    const keys=[...day.am.map(i=>"am_"+i.key),...day.pm.map(i=>"pm_"+i.key)];
+    const done=keys.filter(k=>state[k]).length;
+    const pct=total?Math.round(done/total*100):0;
+    document.getElementById("bar").style.width=pct+"%";
+    document.getElementById("plabel").textContent=`${done} of ${total} done`;
+  }
+
+  function resetDay(){
+    const day=buildDay(viewIdx);
+    [...day.am.map(i=>"am_"+i.key),...day.pm.map(i=>"pm_"+i.key)].forEach(k=>delete state[k]);
+    saveState(viewIdx,state); renderList();
+  }
+
+  function showPage(p){
+    document.getElementById("page-track").classList.toggle("active",p==="track");
+    document.getElementById("page-info").classList.toggle("active",p==="info");
+    document.getElementById("nav-track").classList.toggle("active",p==="track");
+    document.getElementById("nav-info").classList.toggle("active",p==="info");
+    window.scrollTo(0,0);
+  }
+
+  state=load(viewIdx);
+  renderWeek(); renderDays(); renderList();
+</script>
+</body>
+</html>
