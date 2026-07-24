@@ -152,9 +152,9 @@
       <div class="det">1mg = 0.1mL = <b>10 units</b> · daily AM, SubQ. 10mg vial ~10 doses. Start low, titrate to 2mg (20u) later if underwhelming. Note: running alongside NAD+ blends the mitochondrial read.</div>
     </div>
     <div class="info-card">
-      <div class="nm">CJC-1295 / Ipamorelin</div>
-      <div class="recon">2mL BacWater → 2.5mg + 2.5mg/mL</div>
-      <div class="det">125mcg each = 0.05mL = <b>5 units</b> · nightly pre-bed, fasted (~2hr after eating). Tiny draw — pull slowly.</div>
+      <div class="nm">Tesa / Ipa blend <span class="tag exp" style="border:1px solid var(--nad);color:var(--nad)">new</span></div>
+      <div class="recon">1mL BacWater → 10mg/mL Tesa, 3mg/mL Ipa</div>
+      <div class="det">Nexaph 10mg/3mg vial · 0.75mg Tesa + 225mcg Ipa = 0.075mL = <b>7.5 units</b> · nightly pre-bed, fasted (~2hr after eating). Subs CJC-1295. ~13 doses/vial.</div>
     </div>
     <div class="info-card">
       <div class="nm">GHK-Cu / KPV blend (50mg / 10mg) <span class="tag" style="border:1px solid var(--am);color:var(--am)">cycle</span></div>
@@ -163,16 +163,8 @@
     </div>
     <div class="info-card">
       <div class="nm">Retatrutide <span class="tag anchor">weekly</span></div>
-      <div class="recon">finishing Eternal vial</div>
-      <div class="det">1mg = <b>20u</b> now (Eternal), Wednesday nights. Steps to 1.5mg = <b>30u</b> from Wed Jul 1. ION 10mg vial: 2mL → 5mg/mL. Confirm units when opening ION vial.</div>
-    </div>
-  </div>
-  <div class="info-sec">
-    <h2>Queued</h2>
-    <div class="info-card hold">
-      <div class="nm">ION-3R (Retatrutide)</div>
-      <div class="recon">2mL → 5mg/mL · 1mg = 20u</div>
-      <div class="det">Open when Eternal Reta done.</div>
+      <div class="recon">1mL BacWater → 10mg/mL</div>
+      <div class="det">1.5mg = <b>15u</b> through Wed Jul 22. Steps to 2mg = <b>20u</b> starting Wed Jul 29. Wednesday nights.</div>
     </div>
   </div>
   <div class="info-sec">
@@ -181,7 +173,7 @@
     <div class="tip"><b>Deadpool EOD:</b> every other day counting from Jul 1. The app marks pin days automatically — off days show no blend.</div>
     <div class="tip"><b>NAD+:</b> tolerated clean on first pin. Watch each step-up; normal flush fades in minutes. Track HRV/recovery over the window.</div>
     <div class="tip"><b>Site rotation:</b> clockwise around the navel for all SubQ.</div>
-    <div class="tip"><b>Wednesday</b> heavy day: MOTS-C AM (+ Deadpool if a pin day), Reta + CJC/IPA + GHK PM.</div>
+    <div class="tip"><b>Wednesday</b> heavy day: MOTS-C AM (+ Deadpool if a pin day), Reta + Tesa/Ipa + GHK PM.</div>
   </div>
 </div>
 
@@ -193,7 +185,7 @@
 <script>
   const MOTS={key:"mots",name:"MOTS-C",accent:"am",units:"10u",meta:"0.5mg = 0.1mL · 5mg/mL · fasted"};
   const SS31={key:"ss31",name:"SS-31",accent:"nad",units:"10u",meta:"1mg = 0.1mL · 10mg/mL · daily AM"};
-  const CJC ={key:"cjc", name:"CJC / IPA",accent:"pm",units:"5u",meta:"125mcg ea = 0.05mL · fasted"};
+  const TESA ={key:"tesa", name:"Tesa / Ipa",accent:"pm",units:"7.5u",meta:"0.75mg Tesa + 225mcg Ipa = 0.075mL · fasted"};
   const GHK ={key:"ghk", name:"GHK-Cu / KPV",accent:"pm",units:"8u",meta:"GHK 1.6mg + KPV 320mcg = 0.08mL · nightly"};
 
   // Deadpool blend — every other day from Jul 1 2026, 15u (750mcg each)
@@ -217,11 +209,11 @@
     return {key:"nad",name:"NAD+",accent:"nad",units:units,meta:`${dose} · slow push · ${phase}`,tag:"exp"};
   }
 
-  // Reta step — Wednesdays, 1mg → 1.5mg from Jul 1
-  const RETA_STEP=new Date(2026,6,1);
+  // Reta step — Wednesdays, 1.5mg/15u → 2mg/20u from Jul 29 2026 (10mg/mL recon)
+  const RETA_STEP=new Date(2026,6,29);
   function retaCard(dt){
-    let dose,units; if(dt<RETA_STEP){dose="1mg";units="20u";}else{dose="1.5mg";units="30u";}
-    return {key:"reta",name:"Retatrutide",accent:"reta",units:units,meta:`${dose} · Wed PM · ION 5mg/mL`,tag:"anchor"};
+    let dose,units; if(dt<RETA_STEP){dose="1.5mg";units="15u";}else{dose="2mg";units="20u";}
+    return {key:"reta",name:"Retatrutide",accent:"reta",units:units,meta:`${dose} · Wed PM · 10mg/mL`,tag:"anchor"};
   }
 
   function buildDay(idx){
@@ -232,7 +224,7 @@
     am.push(SS31);
     if(isDeadDay(dt)) am.push(deadCard());
     if(isMWF) am.push(nadCard(dt));
-    const pm=[]; if(isWed) pm.push(retaCard(dt)); pm.push(CJC,GHK);
+    const pm=[]; if(isWed) pm.push(retaCard(dt)); pm.push(TESA,GHK);
     return {am,pm};
   }
 
