@@ -137,9 +137,9 @@
       <div class="det">0.5mg = 0.1mL = <b>10 units</b> · M/W/F mornings, fasted or light food. SubQ abdomen.</div>
     </div>
     <div class="info-card">
-      <div class="nm">Deadpool blend <span class="tag eod">EOD</span></div>
-      <div class="recon">2mL BacWater → 15mg/mL (5mg/mL each)</div>
-      <div class="det">BPC-157 / TB-4 / Cartalax · 750mcg each = 0.15mL = <b>15 units</b> · every other day from Jul 1, AM. EZ Peptides 30mg vial, ~13 doses.</div>
+      <div class="nm">BPC-157 / TB-500 <span class="tag eod">EOD</span></div>
+      <div class="recon">1mL BacWater → 10mg/mL each</div>
+      <div class="det">750mcg each = 0.075mL = <b>7.5 units</b> · every other day, AM. 10mg/10mg vial, ~13 doses each side (~26 days). Subs Deadpool blend.</div>
     </div>
     <div class="info-card">
       <div class="nm">NAD+ <span class="tag exp" style="border:1px solid var(--nad);color:var(--nad)">test</span></div>
@@ -170,10 +170,10 @@
   <div class="info-sec">
     <h2>Technique &amp; notes</h2>
     <div class="tip"><b>Universal recon:</b> swab stopper, inject water slowly down the glass wall, swirl gently — never shake — refrigerate once dissolved.</div>
-    <div class="tip"><b>Deadpool EOD:</b> every other day counting from Jul 1. The app marks pin days automatically — off days show no blend.</div>
+    <div class="tip"><b>BPC/TB EOD:</b> every other day counting from Jul 29. The app marks pin days automatically — off days show no blend.</div>
     <div class="tip"><b>NAD+:</b> tolerated clean on first pin. Watch each step-up; normal flush fades in minutes. Track HRV/recovery over the window.</div>
     <div class="tip"><b>Site rotation:</b> clockwise around the navel for all SubQ.</div>
-    <div class="tip"><b>Wednesday</b> heavy day: MOTS-C AM (+ Deadpool if a pin day), Reta + Tesa/Ipa + GHK PM.</div>
+    <div class="tip"><b>Wednesday</b> heavy day: MOTS-C AM (+ BPC/TB if a pin day), Reta + Tesa/Ipa + GHK PM.</div>
   </div>
 </div>
 
@@ -188,13 +188,13 @@
   const TESA ={key:"tesa", name:"Tesa / Ipa",accent:"pm",units:"7.5u",meta:"0.75mg Tesa + 225mcg Ipa = 0.075mL · fasted"};
   const GHK ={key:"ghk", name:"GHK-Cu / KPV",accent:"pm",units:"8u",meta:"GHK 1.6mg + KPV 320mcg = 0.08mL · nightly"};
 
-  // Deadpool blend — every other day from Jul 1 2026, 15u (750mcg each)
-  const DEAD_START = new Date(2026,6,1);
-  function deadCard(){ return {key:"dead",name:"Deadpool blend",accent:"am",units:"15u",
-    meta:"750mcg ea (BPC/TB4/Cart) = 0.15mL · EOD",tag:"eod"}; }
-  function isDeadDay(dt){
-    const days=Math.round((dt-DEAD_START)/86400000);
-    return days>=0 && days%2===0;   // Jul 1, 3, 5...
+  // BPC-157/TB-500 blend — every other day from Jul 29 2026, 7.5u (750mcg each, 10mg/mL)
+  const BPCTB_START = new Date(2026,6,29);
+  function bpctbCard(){ return {key:"bpctb",name:"BPC-157 / TB-500",accent:"am",units:"7.5u",
+    meta:"750mcg ea = 0.075mL · EOD",tag:"eod"}; }
+  function isBpctbDay(dt){
+    const days=Math.round((dt-BPCTB_START)/86400000);
+    return days>=0 && days%2===0;   // Jul 29, 31, Aug 2...
   }
 
   // NAD+ ramp — M/W/F, 2 wks per step from Jun 22
@@ -222,7 +222,7 @@
     const am=[];
     if(isMWF) am.push(MOTS);
     am.push(SS31);
-    if(isDeadDay(dt)) am.push(deadCard());
+    if(isBpctbDay(dt)) am.push(bpctbCard());
     if(isMWF) am.push(nadCard(dt));
     const pm=[]; if(isWed) pm.push(retaCard(dt)); pm.push(TESA,GHK);
     return {am,pm};
@@ -297,7 +297,7 @@
       arr.forEach(it=>{wrap.appendChild(shotEl(it,slot));total++;});
     });
     document.getElementById("nadnote").innerHTML=
-      `<b>NAD+ ramp (2 wks each):</b> Jun 22–Jul 5 15u · Jul 6–19 30u · Jul 20+ 60u. <b>Deadpool</b> shows only on EOD pin days.`;
+      `<b>NAD+ ramp (2 wks each):</b> Jun 22–Jul 5 15u · Jul 6–19 30u · Jul 20+ 60u. <b>BPC/TB</b> shows only on EOD pin days.`;
     updateProgress();
   }
   function updateProgress(){
