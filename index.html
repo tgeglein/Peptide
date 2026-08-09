@@ -123,7 +123,6 @@
     <span><i class="dot reta"></i>Weekly</span>
   </div>
   <div id="list"></div>
-  <div class="note" id="nadnote"></div>
   <button class="reset" onclick="resetDay()">Reset this day</button>
 </div>
 
@@ -142,9 +141,9 @@
       <div class="det">750mcg each = 0.075mL = <b>7.5 units</b> · every other day, AM. 10mg/10mg vial, ~13 doses each side (~26 days). Subs Deadpool blend.</div>
     </div>
     <div class="info-card">
-      <div class="nm">NAD+ <span class="tag exp" style="border:1px solid var(--nad);color:var(--nad)">test</span></div>
-      <div class="recon">3mL BacWater → ~167mg/mL</div>
-      <div class="det">Ramp (2 wks per step): Jun 22–Jul 5 25mg = <b>15u</b> · Jul 6–19 50mg = <b>30u</b> · Jul 20+ 100mg = <b>60u</b>. AM on M/W/F. Slow 60–90s push, hydrate first, rotate sites. n=1 experiment — track HRV/recovery.</div>
+      <div class="nm">NAD+ <span class="tag exp" style="border:1px solid var(--nad);color:var(--nad)">restart</span></div>
+      <div class="recon">5mL BacWater → 200mg/mL (1000mg vial)</div>
+      <div class="det">50mg = 0.25mL = <b>25 units</b> · nightly, PM. 1000mg vial ~20 doses (20 days). Restarted Aug 10 after 1-2wk gap.</div>
     </div>
     <div class="info-card">
       <div class="nm">SS-31 (Elamipretide) <span class="tag exp" style="border:1px solid var(--nad);color:var(--nad)">new</span></div>
@@ -154,7 +153,12 @@
     <div class="info-card">
       <div class="nm">Tesa / Ipa blend <span class="tag exp" style="border:1px solid var(--nad);color:var(--nad)">new</span></div>
       <div class="recon">1mL BacWater → 10mg/mL Tesa, 3mg/mL Ipa</div>
-      <div class="det">Nexaph 10mg/3mg vial · 0.75mg Tesa + 225mcg Ipa = 0.075mL = <b>7.5 units</b> · nightly pre-bed, fasted (~2hr after eating). Subs CJC-1295. ~13 doses/vial.</div>
+      <div class="det">Nexaph 10mg/3mg vial · 0.75mg Tesa + 225mcg Ipa = 0.075mL = <b>7.5 units</b> · AM, fasted. Subs CJC-1295. ~13 doses/vial.</div>
+    </div>
+    <div class="info-card">
+      <div class="nm">Epithalon <span class="tag" style="border:1px solid var(--reta);color:var(--reta)">20-night cycle</span></div>
+      <div class="recon">2mL BacWater → 5mg/mL</div>
+      <div class="det">500mcg = 0.1mL = <b>10 units</b> · nightly, PM, Aug 10–29 2026 (20 nights). One 10mg vial covers the full cycle, no waste. Low-dose test run.</div>
     </div>
     <div class="info-card">
       <div class="nm">GHK-Cu / KPV blend (50mg / 10mg) <span class="tag" style="border:1px solid var(--am);color:var(--am)">cycle</span></div>
@@ -171,9 +175,9 @@
     <h2>Technique &amp; notes</h2>
     <div class="tip"><b>Universal recon:</b> swab stopper, inject water slowly down the glass wall, swirl gently — never shake — refrigerate once dissolved.</div>
     <div class="tip"><b>BPC/TB EOD:</b> every other day counting from Jul 29. The app marks pin days automatically — off days show no blend.</div>
-    <div class="tip"><b>NAD+:</b> tolerated clean on first pin. Watch each step-up; normal flush fades in minutes. Track HRV/recovery over the window.</div>
+    <div class="tip"><b>NAD+:</b> tolerated clean previously. Watch for flush on restart; normal, fades in minutes. Nightly now, not ramped.</div>
     <div class="tip"><b>Site rotation:</b> clockwise around the navel for all SubQ.</div>
-    <div class="tip"><b>Wednesday</b> heavy day: MOTS-C AM (+ BPC/TB if a pin day), Reta + Tesa/Ipa + GHK PM.</div>
+    <div class="tip"><b>Wednesday</b> heavy day: MOTS-C, Tesa/Ipa AM (+ BPC/TB if a pin day), Reta + Epithalon (if in cycle) + NAD+ + GHK PM.</div>
   </div>
 </div>
 
@@ -197,17 +201,14 @@
     return days>=0 && days%2===0;   // Jul 29, 31, Aug 2...
   }
 
-  // NAD+ ramp — M/W/F, 2 wks per step from Jun 22
-  const NAD_START=new Date(2026,5,22);
-  function nadCard(dt){
-    const days=Math.round((dt-NAD_START)/86400000);
-    let dose,units,phase;
-    if(days<0){dose="25mg";units="15u";phase="starts Jun 22";}
-    else if(days<14){dose="25mg";units="15u";phase="Jun 22–Jul 5";}
-    else if(days<28){dose="50mg";units="30u";phase="Jul 6–19";}
-    else{dose="100mg";units="60u";phase="Jul 20+";}
-    return {key:"nad",name:"NAD+",accent:"nad",units:units,meta:`${dose} · slow push · ${phase}`,tag:"exp"};
-  }
+  // NAD+ — flat nightly, restarted Aug 10 2026 (5mL BacWater on 1000mg vial = 200mg/mL)
+  const NAD ={key:"nad", name:"NAD+",accent:"nad",units:"25u",meta:"50mg = 0.25mL · 200mg/mL · nightly"};
+
+  // Epithalon — 20-night test cycle, 500mcg/night, Aug 10–29 2026 (2mL BacWater on 10mg vial = 5mg/mL)
+  const EPI_START=new Date(2026,7,10), EPI_END=new Date(2026,7,29);
+  function isEpiDay(dt){ return dt>=EPI_START && dt<=EPI_END; }
+  function epiCard(){ return {key:"epi",name:"Epithalon",accent:"reta",units:"10u",
+    meta:"500mcg = 0.1mL · 5mg/mL · night 20-cycle",tag:"exp"}; }
 
   // Reta step — Wednesdays, 1.5mg/15u → 2mg/20u from Jul 29 2026 (10mg/mL recon)
   const RETA_STEP=new Date(2026,6,29);
@@ -223,8 +224,8 @@
     if(isMWF) am.push(MOTS);
     am.push(SS31);
     if(isBpctbDay(dt)) am.push(bpctbCard());
-    if(isMWF) am.push(nadCard(dt));
-    const pm=[]; if(isWed) pm.push(retaCard(dt)); pm.push(TESA,GHK);
+    am.push(TESA);
+    const pm=[]; if(isWed) pm.push(retaCard(dt)); if(isEpiDay(dt)) pm.push(epiCard()); pm.push(NAD,GHK);
     return {am,pm};
   }
 
@@ -296,8 +297,6 @@
       h.innerHTML=`${label}<span class="line"></span>`; wrap.appendChild(h);
       arr.forEach(it=>{wrap.appendChild(shotEl(it,slot));total++;});
     });
-    document.getElementById("nadnote").innerHTML=
-      `<b>NAD+ ramp (2 wks each):</b> Jun 22–Jul 5 15u · Jul 6–19 30u · Jul 20+ 60u. <b>BPC/TB</b> shows only on EOD pin days.`;
     updateProgress();
   }
   function updateProgress(){
