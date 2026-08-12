@@ -143,12 +143,12 @@
     <div class="info-card">
       <div class="nm">NAD+ <span class="tag exp" style="border:1px solid var(--nad);color:var(--nad)">restart</span></div>
       <div class="recon">5mL BacWater → 200mg/mL (1000mg vial)</div>
-      <div class="det">50mg = 0.25mL = <b>25 units</b> · nightly, PM. 1000mg vial ~20 doses (20 days). Restarted Aug 10 after 1-2wk gap.</div>
+      <div class="det">50mg = 0.25mL = <b>25 units</b> · nightly, moved to AM Aug 12 (energizing effect, avoids fighting sleep onset). 1000mg vial ~20 doses (20 days).</div>
     </div>
-    <div class="info-card">
-      <div class="nm">SS-31 (Elamipretide) <span class="tag exp" style="border:1px solid var(--nad);color:var(--nad)">new</span></div>
+    <div class="info-card hold">
+      <div class="nm">SS-31 (Elamipretide) <span class="tag" style="border:1px solid var(--am);color:var(--am)">on break</span></div>
       <div class="recon">1mL BacWater → 10mg/mL</div>
-      <div class="det">1mg = 0.1mL = <b>10 units</b> · daily AM, SubQ. 10mg vial ~10 doses. Start low, titrate to 2mg (20u) later if underwhelming. Note: running alongside NAD+ blends the mitochondrial read.</div>
+      <div class="det">Finished 10-dose vial Aug 12. Off for 2-4 wks before restarting — no continuous-dosing rationale for this one, breaks preserve the read on whether it's doing anything.</div>
     </div>
     <div class="info-card">
       <div class="nm">Tesa / Ipa blend <span class="tag exp" style="border:1px solid var(--nad);color:var(--nad)">new</span></div>
@@ -163,7 +163,7 @@
     <div class="info-card">
       <div class="nm">GHK-Cu / KPV blend (50mg / 10mg) <span class="tag" style="border:1px solid var(--am);color:var(--am)">cycle</span></div>
       <div class="recon">2.5mL BacWater → GHK 20mg/mL, KPV 4mg/mL</div>
-      <div class="det">8 units = GHK 1.6mg + KPV 320mcg · nightly, SubQ. Start Mon (6 days off prior GHK). Run ~4 wks then break. ~31 doses.</div>
+      <div class="det">8 units = GHK 1.6mg + KPV 320mcg · nightly, SubQ. New vial reconstituted Wed Aug 12. Run ~4 wks (through ~Sep 9) then break. ~31 doses.</div>
     </div>
     <div class="info-card">
       <div class="nm">Retatrutide <span class="tag anchor">weekly</span></div>
@@ -175,9 +175,9 @@
     <h2>Technique &amp; notes</h2>
     <div class="tip"><b>Universal recon:</b> swab stopper, inject water slowly down the glass wall, swirl gently — never shake — refrigerate once dissolved.</div>
     <div class="tip"><b>BPC/TB EOD:</b> every other day counting from Jul 29. The app marks pin days automatically — off days show no blend.</div>
-    <div class="tip"><b>NAD+:</b> tolerated clean previously. Watch for flush on restart; normal, fades in minutes. Nightly now, not ramped.</div>
+    <div class="tip"><b>NAD+:</b> tolerated clean previously. Watch for flush; normal, fades in minutes. Now AM — avoids energizing effect fighting sleep onset.</div>
     <div class="tip"><b>Site rotation:</b> clockwise around the navel for all SubQ.</div>
-    <div class="tip"><b>Wednesday</b> heavy day: MOTS-C, Tesa/Ipa AM (+ BPC/TB if a pin day), Reta + Epithalon (if in cycle) + NAD+ + GHK PM.</div>
+    <div class="tip"><b>Wednesday</b> heavy day: MOTS-C, Tesa/Ipa, NAD+ AM (+ BPC/TB if a pin day), Reta + Epithalon (if in cycle) + GHK PM.</div>
   </div>
 </div>
 
@@ -188,7 +188,6 @@
 
 <script>
   const MOTS={key:"mots",name:"MOTS-C",accent:"am",units:"10u",meta:"0.5mg = 0.1mL · 5mg/mL · fasted"};
-  const SS31={key:"ss31",name:"SS-31",accent:"nad",units:"10u",meta:"1mg = 0.1mL · 10mg/mL · daily AM"};
   const TESA ={key:"tesa", name:"Tesa / Ipa",accent:"pm",units:"7.5u",meta:"0.75mg Tesa + 225mcg Ipa = 0.075mL · fasted"};
   const GHK ={key:"ghk", name:"GHK-Cu / KPV",accent:"pm",units:"8u",meta:"GHK 1.6mg + KPV 320mcg = 0.08mL · nightly"};
 
@@ -222,10 +221,9 @@
     const isMWF=(idx===0||idx===2||idx===4), isWed=(idx===2);
     const am=[];
     if(isMWF) am.push(MOTS);
-    am.push(SS31);
     if(isBpctbDay(dt)) am.push(bpctbCard());
-    am.push(TESA);
-    const pm=[]; if(isWed) pm.push(retaCard(dt)); if(isEpiDay(dt)) pm.push(epiCard()); pm.push(NAD,GHK);
+    am.push(TESA,NAD);
+    const pm=[]; if(isWed) pm.push(retaCard(dt)); if(isEpiDay(dt)) pm.push(epiCard()); pm.push(GHK);
     return {am,pm};
   }
 
