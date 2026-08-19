@@ -73,6 +73,8 @@
   .tag.anchor{color:var(--reta);border:1px solid var(--reta);}
   .tag.exp{color:var(--nad);border:1px solid var(--nad);}
   .tag.eod{color:var(--am);border:1px solid var(--am);}
+  .tag.daily{color:var(--am);border:1px solid var(--am);}
+  .tag.biw{color:var(--am);border:1px solid var(--am);}
   .note{margin:14px 18px 0;padding:13px 15px;background:var(--surface);
     border:1px solid var(--line);border-left:3px solid var(--am);border-radius:10px;
     font-size:12.5px;color:var(--muted);}
@@ -136,9 +138,14 @@
       <div class="det">0.5mg = 0.1mL = <b>10 units</b> · M/W/F mornings, fasted or light food. SubQ abdomen.</div>
     </div>
     <div class="info-card">
-      <div class="nm">BPC-157 / TB-500 <span class="tag eod">EOD</span></div>
-      <div class="recon">1mL BacWater → 10mg/mL each</div>
-      <div class="det">750mcg each = 0.075mL = <b>7.5 units</b> · every other day, AM. 10mg/10mg vial, ~13 doses each side (~26 days). Subs Deadpool blend.</div>
+      <div class="nm">BPC-157 (standalone) <span class="tag eod">phased</span></div>
+      <div class="recon">2mL BacWater → 5mg/mL</div>
+      <div class="det">Loading (Aug 17–Sep 20): 500mcg = 0.1mL = <b>10u</b>, AM + PM daily. Maintenance (Sep 21+): 500mcg = <b>10u</b>, EOD. 10mg vial ~10 days loading / ~20 days maintenance.</div>
+    </div>
+    <div class="info-card">
+      <div class="nm">TB-500 (standalone) <span class="tag eod">phased</span></div>
+      <div class="recon">1mL BacWater → 10mg/mL</div>
+      <div class="det">Loading (Aug 17–Sep 20): 2.5mg = 0.25mL = <b>25u</b>, Mon + Thu. Maintenance (Sep 21+): 2.5mg = <b>25u</b>, every 12 days. 10mg vial = 4 doses (~2wk loading / ~6-8wk maintenance). Fresh vials reconstituted Aug 19.</div>
     </div>
     <div class="info-card">
       <div class="nm">NAD+ <span class="tag exp" style="border:1px solid var(--nad);color:var(--nad)">restart</span></div>
@@ -174,10 +181,10 @@
   <div class="info-sec">
     <h2>Technique &amp; notes</h2>
     <div class="tip"><b>Universal recon:</b> swab stopper, inject water slowly down the glass wall, swirl gently — never shake — refrigerate once dissolved.</div>
-    <div class="tip"><b>BPC/TB EOD:</b> every other day counting from Jul 29. The app marks pin days automatically — off days show no blend.</div>
+    <div class="tip"><b>BPC/TB phased:</b> loading Aug 17–Sep 20 (BPC AM+PM daily, TB Mon+Thu), then maintenance (BPC EOD, TB every 12d). App switches automatically at the phase date.</div>
     <div class="tip"><b>NAD+:</b> tolerated clean previously. Watch for flush; normal, fades in minutes. Now AM — avoids energizing effect fighting sleep onset.</div>
     <div class="tip"><b>Site rotation:</b> clockwise around the navel for all SubQ.</div>
-    <div class="tip"><b>Wednesday</b> heavy day: MOTS-C, Tesa/Ipa, NAD+ AM (+ BPC/TB if a pin day), Reta + Epithalon (if in cycle) + GHK PM.</div>
+    <div class="tip"><b>Wednesday</b> heavy day: MOTS-C, Tesa/Ipa, NAD+, BPC/TB (if pin day) AM, Reta + Epithalon (if in cycle) + GHK PM.</div>
   </div>
 </div>
 
@@ -191,13 +198,32 @@
   const TESA ={key:"tesa", name:"Tesa / Ipa",accent:"pm",units:"7.5u",meta:"0.75mg Tesa + 225mcg Ipa = 0.075mL · fasted"};
   const GHK ={key:"ghk", name:"GHK-Cu / KPV",accent:"pm",units:"8u",meta:"GHK 1.6mg + KPV 320mcg = 0.08mL · nightly"};
 
-  // BPC-157/TB-500 blend — every other day from Jul 29 2026, 7.5u (750mcg each, 10mg/mL)
-  const BPCTB_START = new Date(2026,6,29);
-  function bpctbCard(){ return {key:"bpctb",name:"BPC-157 / TB-500",accent:"am",units:"7.5u",
-    meta:"750mcg ea = 0.075mL · EOD",tag:"eod"}; }
-  function isBpctbDay(dt){
-    const days=Math.round((dt-BPCTB_START)/86400000);
-    return days>=0 && days%2===0;   // Jul 29, 31, Aug 2...
+  // BPC-157 & TB-500 — split standalone, phased. Loading Aug 17–Sep 20, maintenance Sep 21+
+  const LOAD_START = new Date(2026,7,17), LOAD_END = new Date(2026,8,21);
+  function isLoading(dt){ return dt>=LOAD_START && dt<LOAD_END; }
+  function bpcCard(dt,slot){
+    const loading=isLoading(dt);
+    return {key:"bpc"+slot,name:"BPC-157",accent:"am",units:"10u",
+      meta: loading ? `500mcg = 0.1mL · loading, ${slot.toUpperCase()}` : "500mcg = 0.1mL · maintenance, EOD",
+      tag: loading ? "daily" : "eod"};
+  }
+  function isBpcPmDay(dt){ return isLoading(dt); }          // loading: AM+PM daily
+  function isBpcAmDay(dt){
+    if(isLoading(dt)) return true;                          // loading: AM dose daily
+    const days=Math.round((dt-LOAD_END)/86400000);          // maintenance: EOD from load-end
+    return days>=0 && days%2===0;
+  }
+  function tbCard(dt){
+    const loading=isLoading(dt);
+    return {key:"tb",name:"TB-500",accent:"am",units:"25u",
+      meta: loading ? "2.5mg = 0.25mL · loading, Mon+Thu" : "2.5mg = 0.25mL · maintenance, every 12d",
+      tag: loading ? "biw" : "eod"};
+  }
+  function isTbDay(dt){
+    const dow=dt.getDay(); // 0=Sun...6=Sat
+    if(isLoading(dt)) return dow===1||dow===4;               // Mon/Thu
+    const days=Math.round((dt-LOAD_END)/86400000);
+    return days>=0 && days%12===0;
   }
 
   // NAD+ — flat nightly, restarted Aug 10 2026 (5mL BacWater on 1000mg vial = 200mg/mL)
@@ -221,9 +247,11 @@
     const isMWF=(idx===0||idx===2||idx===4), isWed=(idx===2);
     const am=[];
     if(isMWF) am.push(MOTS);
-    if(isBpctbDay(dt)) am.push(bpctbCard());
+    if(isBpcAmDay(dt)) am.push(bpcCard(dt,"am"));
+    if(isTbDay(dt)) am.push(tbCard(dt));
     am.push(TESA,NAD);
-    const pm=[]; if(isWed) pm.push(retaCard(dt)); if(isEpiDay(dt)) pm.push(epiCard()); pm.push(GHK);
+    const pm=[]; if(isBpcPmDay(dt)) pm.push(bpcCard(dt,"pm"));
+    if(isWed) pm.push(retaCard(dt)); if(isEpiDay(dt)) pm.push(epiCard()); pm.push(GHK);
     return {am,pm};
   }
 
@@ -277,7 +305,7 @@
     el.className="shot"+(state[id]?" checked":"");
     el.innerHTML=`<span class="accent ${item.accent}"></span>`+
       `<div class="body"><div class="name">${item.name}`+
-      (item.tag?`<span class="tag ${item.tag}">${item.tag==="anchor"?"weekly":item.tag==="eod"?"EOD":"test"}</span>`:``)+
+      (item.tag?`<span class="tag ${item.tag}">${item.tag==="anchor"?"weekly":item.tag==="eod"?"EOD":item.tag==="daily"?"Daily":item.tag==="biw"?"2x/wk":"test"}</span>`:``)+
       `</div><div class="meta">${item.meta}</div></div>`+
       `<span class="units">${item.units}</span>`+
       `<span class="check">${state[id]?"✓":""}</span>`;
