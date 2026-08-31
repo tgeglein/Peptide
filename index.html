@@ -121,7 +121,7 @@
   <div class="legend">
     <span><i class="dot am"></i>Morning</span>
     <span><i class="dot pm"></i>Evening</span>
-    <span><i class="dot nad"></i>NAD+ test</span>
+    <span><i class="dot nad"></i>NAD+ (paused)</span>
     <span><i class="dot reta"></i>Weekly</span>
   </div>
   <div id="list"></div>
@@ -148,9 +148,9 @@
       <div class="det">Loading (Aug 17–Sep 20): 2.5mg = 0.25mL = <b>25u</b>, Mon + Thu. Maintenance (Sep 21+): 2.5mg = <b>25u</b>, every 12 days. 10mg vial = 4 doses (~2wk loading / ~6-8wk maintenance). Fresh vials reconstituted Aug 19.</div>
     </div>
     <div class="info-card">
-      <div class="nm">NAD+ <span class="tag exp" style="border:1px solid var(--nad);color:var(--nad)">restart</span></div>
+      <div class="nm">NAD+ <span class="tag" style="border:1px solid var(--am);color:var(--am)">paused</span></div>
       <div class="recon">5mL BacWater → 200mg/mL (1000mg vial)</div>
-      <div class="det">50mg = 0.25mL = <b>25 units</b> · nightly, moved to AM Aug 12 (energizing effect, avoids fighting sleep onset). 1000mg vial ~20 doses (20 days).</div>
+      <div class="det">50mg = 0.25mL = <b>25 units</b> · paused Mon Aug 31 (vial ran out) — testing whether it's contributing to HRV/sleep disruption alongside BPC. Hold off restarting a few days for a clean read.</div>
     </div>
     <div class="info-card hold">
       <div class="nm">SS-31 (Elamipretide) <span class="tag" style="border:1px solid var(--am);color:var(--am)">on break</span></div>
@@ -182,9 +182,9 @@
     <h2>Technique &amp; notes</h2>
     <div class="tip"><b>Universal recon:</b> swab stopper, inject water slowly down the glass wall, swirl gently — never shake — refrigerate once dissolved.</div>
     <div class="tip"><b>BPC/TB phased:</b> loading Aug 17–Sep 20 (BPC AM+PM daily, TB Mon+Thu), then maintenance (BPC EOD, TB every 12d). App switches automatically at the phase date.</div>
-    <div class="tip"><b>NAD+:</b> tolerated clean previously. Watch for flush; normal, fades in minutes. Now AM — avoids energizing effect fighting sleep onset.</div>
+    <div class="tip"><b>NAD+:</b> paused Aug 31 to isolate its contribution to the HRV/sleep dip. Restart only after a few clean days off.</div>
     <div class="tip"><b>Site rotation:</b> clockwise around the navel for all SubQ.</div>
-    <div class="tip"><b>Wednesday</b> heavy day: MOTS-C, Tesa/Ipa, NAD+, BPC/TB (if pin day) AM, Reta + Epithalon (if in cycle) + GHK PM.</div>
+    <div class="tip"><b>Wednesday</b> heavy day: MOTS-C, Tesa/Ipa, BPC/TB (if pin day) AM, Reta + Epithalon (if in cycle) + GHK PM. (NAD+ paused.)</div>
   </div>
 </div>
 
@@ -249,7 +249,7 @@
     if(isMWF) am.push(MOTS);
     if(isBpcAmDay(dt)) am.push(bpcCard(dt,"am"));
     if(isTbDay(dt)) am.push(tbCard(dt));
-    am.push(TESA,NAD);
+    am.push(TESA);
     const pm=[]; if(isBpcPmDay(dt)) pm.push(bpcCard(dt,"pm"));
     if(isWed) pm.push(retaCard(dt)); if(isEpiDay(dt)) pm.push(epiCard()); pm.push(GHK);
     return {am,pm};
