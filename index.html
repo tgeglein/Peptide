@@ -163,9 +163,14 @@
       <div class="det">Nexaph 10mg/3mg vial · 0.75mg Tesa + 225mcg Ipa = 0.075mL = <b>7.5 units</b> · AM, fasted. Subs CJC-1295. ~13 doses/vial.</div>
     </div>
     <div class="info-card">
-      <div class="nm">Epithalon <span class="tag" style="border:1px solid var(--reta);color:var(--reta)">20-night cycle</span></div>
+      <div class="nm">Epithalon <span class="tag" style="border:1px solid var(--reta);color:var(--reta)">paused</span></div>
       <div class="recon">2mL BacWater → 5mg/mL</div>
-      <div class="det">500mcg = 0.1mL = <b>10 units</b> · nightly, PM, Aug 10–29 2026 (20 nights). One 10mg vial covers the full cycle, no waste. Low-dose test run.</div>
+      <div class="det">500mcg = 0.1mL = <b>10 units</b> · ran Aug 10–19 (10 of 20 nights). Paused — HRV declined from ~38ms to 31ms (balanced → low) over that exact window, no other stack change overlapped it. ~3.7mg used, vial has runway left if resumed.</div>
+    </div>
+    <div class="info-card">
+      <div class="nm">Thymosin Alpha-1 <span class="tag" style="border:1px solid var(--am);color:var(--am)">acute · 10 days</span></div>
+      <div class="recon">2mL BacWater → 5mg/mL</div>
+      <div class="det">1mg = 0.2mL = <b>20 units</b> · daily, AM, Aug 31–Sep 9 2026. Started for sinus congestion/pressure/drainage. 10mg vial = 10 doses, no waste. Taper to 2x/week maintenance if continuing past acute window.</div>
     </div>
     <div class="info-card">
       <div class="nm">GHK-Cu / KPV blend (50mg / 10mg) <span class="tag" style="border:1px solid var(--am);color:var(--am)">cycle</span></div>
@@ -230,10 +235,16 @@
   const NAD ={key:"nad", name:"NAD+",accent:"nad",units:"25u",meta:"50mg = 0.25mL · 200mg/mL · nightly"};
 
   // Epithalon — 20-night test cycle, 500mcg/night, Aug 10–29 2026 (2mL BacWater on 10mg vial = 5mg/mL)
-  const EPI_START=new Date(2026,7,10), EPI_END=new Date(2026,7,29);
+  const EPI_START=new Date(2026,7,10), EPI_END=new Date(2026,7,19); // paused early, day 10 of 20
   function isEpiDay(dt){ return dt>=EPI_START && dt<=EPI_END; }
   function epiCard(){ return {key:"epi",name:"Epithalon",accent:"reta",units:"10u",
     meta:"500mcg = 0.1mL · 5mg/mL · night 20-cycle",tag:"exp"}; }
+
+  // Thymosin Alpha-1 — acute immune-support course, 10 days, Aug 31–Sep 9 2026 (2mL BacWater on 10mg vial = 5mg/mL)
+  const TA1_START=new Date(2026,7,31), TA1_END=new Date(2026,8,9);
+  function isTa1Day(dt){ return dt>=TA1_START && dt<=TA1_END; }
+  function ta1Card(){ return {key:"ta1",name:"Thymosin Alpha-1",accent:"am",units:"20u",
+    meta:"1mg = 0.2mL · 5mg/mL · AM, acute course",tag:"exp"}; }
 
   // Reta step — Wednesdays, 1.5mg/15u → 2mg/20u from Jul 29 2026 (10mg/mL recon)
   const RETA_STEP=new Date(2026,6,29);
@@ -250,6 +261,7 @@
     if(isBpcAmDay(dt)) am.push(bpcCard(dt,"am"));
     if(isTbDay(dt)) am.push(tbCard(dt));
     am.push(TESA);
+    if(isTa1Day(dt)) am.push(ta1Card());
     const pm=[]; if(isBpcPmDay(dt)) pm.push(bpcCard(dt,"pm"));
     if(isWed) pm.push(retaCard(dt)); if(isEpiDay(dt)) pm.push(epiCard()); pm.push(GHK);
     return {am,pm};
