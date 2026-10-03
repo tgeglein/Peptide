@@ -132,10 +132,10 @@
   <header><div class="title-row"><h1>Protocol</h1><span class="date">reference</span></div></header>
   <div class="info-sec">
     <h2>Active — reconstituted</h2>
-    <div class="info-card">
-      <div class="nm">MOTS-C</div>
+    <div class="info-card hold">
+      <div class="nm">MOTS-C <span class="tag" style="border:1px solid var(--am);color:var(--am)">stopped</span></div>
       <div class="recon">2mL BacWater → 5mg/mL</div>
-      <div class="det">0.5mg = 0.1mL = <b>10 units</b> · M/W/F mornings, fasted or light food. SubQ abdomen.</div>
+      <div class="det">Stopped — swollen, warm injection-site welts from this Nexaph batch, same reaction pattern as an earlier Nexaph Tesa/Ipa vial. Vendor-level concern, not compound-specific. Not currently sourcing MOTS-C.</div>
     </div>
     <div class="info-card">
       <div class="nm">BPC-157 (standalone) <span class="tag eod">phased</span></div>
@@ -162,10 +162,10 @@
       <div class="recon">1mL BacWater → 10mg/mL</div>
       <div class="det">Finished 10-dose vial Aug 12. Off for 2-4 wks before restarting — no continuous-dosing rationale for this one, breaks preserve the read on whether it's doing anything.</div>
     </div>
-    <div class="info-card">
-      <div class="nm">Tesa / Ipa blend <span class="tag exp" style="border:1px solid var(--nad);color:var(--nad)">new</span></div>
+    <div class="info-card hold">
+      <div class="nm">Tesa / Ipa blend <span class="tag" style="border:1px solid var(--am);color:var(--am)">on break</span></div>
       <div class="recon">1mL BacWater → 10mg/mL Tesa, 3mg/mL Ipa</div>
-      <div class="det">Nexaph 10mg/3mg vial · 0.75mg Tesa + 225mcg Ipa = 0.075mL = <b>7.5 units</b> · AM, fasted. Subs CJC-1295. ~13 doses/vial.</div>
+      <div class="det">Vial finished Oct 2. Off 4-6 wks (~Nov 6-13) before restarting — standard break for GHRH/GHRP secretagogues after continuous use, preserves pituitary sensitivity. Tell Claude when ready to restart to lock in the date and vendor/dose.</div>
     </div>
     <div class="info-card">
       <div class="nm">Epithalon <span class="tag" style="border:1px solid var(--reta);color:var(--reta)">paused</span></div>
@@ -185,7 +185,7 @@
     <div class="info-card">
       <div class="nm">Retatrutide <span class="tag anchor">weekly</span></div>
       <div class="recon">1mL BacWater → 10mg/mL</div>
-      <div class="det">1.5mg = <b>15u</b> through Wed Jul 22. Steps to 2mg = <b>20u</b> starting Wed Jul 29. Wednesday nights.</div>
+      <div class="det">2.5mg = <b>25u</b> · Wednesday nights, stepped up from 2mg on Sep 9. Nexaph-sourced — maintaining for now, watching injection site after MOTS-C/Tesa-Ipa welts from same vendor on other products.</div>
     </div>
   </div>
   <div class="info-sec">
@@ -195,7 +195,7 @@
     <div class="tip"><b>NAD+:</b> restarted Sep 11 at M/W/F instead of daily, testing whether reduced frequency avoids the earlier HRV dip.</div>
     <div class="tip"><b>Glutathione:</b> flex Sat/Sun based on drinking load — heavier night gets the dose the next morning.</div>
     <div class="tip"><b>Site rotation:</b> clockwise around the navel for all SubQ.</div>
-    <div class="tip"><b>Wednesday</b> heavy day: MOTS-C, Tesa/Ipa, NAD+, BPC/TB (if pin day) AM, Reta + Epithalon (if in cycle) + GHK PM.</div>
+    <div class="tip"><b>Wednesday</b> heavy day: NAD+, BPC/TB (if pin day) AM, Reta + Epithalon (if in cycle) + GHK PM. (MOTS-C stopped, Tesa/Ipa on break — add back if/when either resumes.)</div>
   </div>
 </div>
 
@@ -254,10 +254,13 @@
   function ta1Card(){ return {key:"ta1",name:"Thymosin Alpha-1",accent:"am",units:"20u",
     meta:"1mg = 0.2mL · 5mg/mL · AM, acute course",tag:"exp"}; }
 
-  // Reta step — Wednesdays, 1.5mg/15u → 2mg/20u from Jul 29 2026 (10mg/mL recon)
-  const RETA_STEP=new Date(2026,6,29);
+  // Reta steps — Wednesdays, 10mg/mL recon. 1.5mg(Jul1)→2mg(Jul29)→2.5mg(Sep9)
+  const RETA_STEP2=new Date(2026,6,29), RETA_STEP3=new Date(2026,8,9);
   function retaCard(dt){
-    let dose,units; if(dt<RETA_STEP){dose="1.5mg";units="15u";}else{dose="2mg";units="20u";}
+    let dose,units;
+    if(dt<RETA_STEP2){dose="1.5mg";units="15u";}
+    else if(dt<RETA_STEP3){dose="2mg";units="20u";}
+    else {dose="2.5mg";units="25u";}
     return {key:"reta",name:"Retatrutide",accent:"reta",units:units,meta:`${dose} · Wed PM · 10mg/mL`,tag:"anchor"};
   }
 
@@ -265,10 +268,10 @@
     const dt=dateForIdx(idx);
     const isMWF=(idx===0||idx===2||idx===4), isWed=(idx===2), isSun=(idx===6);
     const am=[];
-    if(isMWF) am.push(MOTS,NAD);
+    if(isMWF) am.push(NAD); // MOTS-C stopped — Nexaph vendor welts
     if(isBpcAmDay(dt)) am.push(bpcCard(dt,"am"));
     if(isTbDay(dt)) am.push(tbCard(dt));
-    am.push(TESA);
+    // Tesa/Ipa on break (vial finished Oct 2) — resume via am.push(TESA) when restarting
     if(isTa1Day(dt)) am.push(ta1Card());
     if(isSun) am.push(GLUT);
     const pm=[]; if(isBpcPmDay(dt)) pm.push(bpcCard(dt,"pm"));
