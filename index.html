@@ -162,10 +162,10 @@
       <div class="recon">1mL BacWater → 10mg/mL</div>
       <div class="det">Finished 10-dose vial Aug 12. Off for 2-4 wks before restarting — no continuous-dosing rationale for this one, breaks preserve the read on whether it's doing anything.</div>
     </div>
-    <div class="info-card hold">
-      <div class="nm">Tesa / Ipa blend <span class="tag" style="border:1px solid var(--am);color:var(--am)">on break</span></div>
-      <div class="recon">1mL BacWater → 10mg/mL Tesa, 3mg/mL Ipa</div>
-      <div class="det">Vial finished Oct 2. Off 4-6 wks (~Nov 6-13) before restarting — standard break for GHRH/GHRP secretagogues after continuous use, preserves pituitary sensitivity. Tell Claude when ready to restart to lock in the date and vendor/dose.</div>
+    <div class="info-card">
+      <div class="nm">Tesa / Ipa blend <span class="tag" style="border:1px solid var(--am);color:var(--am)">restarted Oct 22</span></div>
+      <div class="recon">Crush 16mg blend: 1mL BacWater → ~13mg/mL Tesa, 3mg/mL Ipa (confirm split on COA)</div>
+      <div class="det">7.5 units = 0.075mL = ~0.975mg Tesa + 225mcg Ipa · daily AM, fasted, both in one syringe. ~13 doses/vial, 3 vials. Restarted Oct 22 after a ~3 wk break. Watch injection site on first doses (new vendor/lot).</div>
     </div>
     <div class="info-card">
       <div class="nm">Epithalon <span class="tag" style="border:1px solid var(--reta);color:var(--reta)">paused</span></div>
@@ -185,7 +185,7 @@
     <div class="info-card">
       <div class="nm">GHK-Cu / KPV blend (50mg / 10mg) <span class="tag" style="border:1px solid var(--am);color:var(--am)">on break</span></div>
       <div class="recon">2.5mL BacWater → GHK 20mg/mL, KPV 4mg/mL</div>
-      <div class="det">Vial finished Oct 11 (reconstituted Sep 11, ~4 wk cycle). Off 2-4 wks (~Oct 25–Nov 8) before restarting at 8 units nightly (GHK 1.6mg + KPV 320mcg). Tell Claude when ready to restart.</div>
+      <div class="det">Vial finished Oct 11 (reconstituted Sep 11, ~4 wk cycle). Off 2-4 wks (~Oct 25–Nov 8). New Crush 70mg vials in hand (2): per COA lot CR-GHKKPV-0903 (52.69mg GHK / 21.00mg KPV) mix 2.5mL, 8 units nightly = GHK ~1.69mg + KPV ~670mcg, ~31 nights/vial. Check vial lot matches COA. Restart date TBD.</div>
     </div>
     <div class="info-card">
       <div class="nm">Retatrutide <span class="tag anchor">weekly</span></div>
@@ -200,7 +200,7 @@
     <div class="tip"><b>NAD+:</b> restarted Sep 11 at M/W/F instead of daily, testing whether reduced frequency avoids the earlier HRV dip.</div>
     <div class="tip"><b>Glutathione:</b> flex Sat/Sun based on drinking load — heavier night gets the dose the next morning.</div>
     <div class="tip"><b>Site rotation:</b> clockwise around the navel for all SubQ.</div>
-    <div class="tip"><b>Wednesday</b> heavy day: NAD+, BPC/TB (if pin day) AM, Reta + Epithalon (if in cycle) PM. (MOTS-C stopped, Tesa/Ipa and GHK-Cu/KPV on break — add back if/when they resume.)</div>
+    <div class="tip"><b>Wednesday</b> heavy day: NAD+, Tesa/Ipa, BPC/TB (if pin day) AM, Reta + Epithalon (if in cycle) PM. (MOTS-C stopped, GHK-Cu/KPV on break — add back if/when it resumes.)</div>
   </div>
 </div>
 
@@ -211,7 +211,8 @@
 
 <script>
   const MOTS={key:"mots",name:"MOTS-C",accent:"am",units:"10u",meta:"0.5mg = 0.1mL · 5mg/mL · fasted"};
-  const TESA ={key:"tesa", name:"Tesa / Ipa",accent:"pm",units:"7.5u",meta:"0.75mg Tesa + 225mcg Ipa = 0.075mL · fasted"};
+  const TESA ={key:"tesa", name:"Tesa / Ipa",accent:"am",units:"7.5u",meta:"~0.975mg Tesa + 225mcg Ipa = 0.075mL · fasted AM"};
+  const TESA_RESTART=new Date(2026,9,22);
   const GHK ={key:"ghk", name:"GHK-Cu / KPV",accent:"pm",units:"8u",meta:"GHK 1.6mg + KPV 320mcg = 0.08mL · nightly"};
 
   // BPC-157 & TB-500 — split standalone, phased. Loading Aug 17–Sep 20, maintenance Sep 21+
@@ -296,7 +297,7 @@
     if(isMWF) am.push(NAD); // MOTS-C stopped — Nexaph vendor welts
     if(isBpcAmDay(dt)) am.push(bpcCard(dt,"am"));
     if(isTbDay(dt)) am.push(tbCard(dt));
-    // Tesa/Ipa on break (vial finished Oct 2) — resume via am.push(TESA) when restarting
+    if(dt>=TESA_RESTART) am.push(TESA); // on break Oct 2–21, restarted Oct 22 (Crush 16mg blend)
     if(isTa1Day(dt)) am.push(ta1Card());
     if(isAraDay(dt)) am.push(araCard(dt));
     if(isSun) am.push(GLUT);
