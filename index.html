@@ -183,9 +183,9 @@
       <div class="det">From Oct 12: 4mg = 0.43mL = <b>43 units</b> · daily, SubQ (abdomen/thigh, rotate), through Oct 29. ~4 doses/vial (18.62mg ÷ 4mg = 4.65). Days 1–10 (Oct 2–11) were Crush 10mg vials at 3.33mg/33u. Nerve repair/neuropathic pain trial dose is 4mg; no fasting requirement.</div>
     </div>
     <div class="info-card">
-      <div class="nm">GHK-Cu / KPV blend (50mg / 10mg) <span class="tag" style="border:1px solid var(--am);color:var(--am)">on break</span></div>
-      <div class="recon">2.5mL BacWater → GHK 20mg/mL, KPV 4mg/mL</div>
-      <div class="det">Vial finished Oct 11 (reconstituted Sep 11, ~4 wk cycle). Off 2-4 wks (~Oct 25–Nov 8). New Crush 70mg vials in hand (2): per COA lot CR-GHKKPV-0903 (52.69mg GHK / 21.00mg KPV) mix 2.5mL, 8 units nightly = GHK ~1.69mg + KPV ~670mcg, ~31 nights/vial. Check vial lot matches COA. Restart date TBD.</div>
+      <div class="nm">GHK-Cu / KPV blend (50mg / 10mg) <span class="tag" style="border:1px solid var(--pm);color:var(--pm)">active</span></div>
+      <div class="recon">Crush 70mg: 2.5mL BacWater → 28mg/mL total (GHK ~21.1mg/mL, KPV ~8.4mg/mL)</div>
+      <div class="det">Restarted Oct 28 after a 2.5-wk break. Crush 70mg vial #1 (2 in hand): per COA lot CR-GHKKPV-0903 (52.69mg GHK / 21.00mg KPV) mix 2.5mL, 8 units nightly = GHK ~1.69mg + KPV ~670mcg, ~31 nights/vial. Check vial lot matches COA. Discard after ~28-30 days; vial #2 for next cycle.</div>
     </div>
     <div class="info-card">
       <div class="nm">Retatrutide <span class="tag anchor">weekly</span></div>
@@ -200,7 +200,7 @@
     <div class="tip"><b>NAD+:</b> restarted Sep 11 at M/W/F instead of daily, testing whether reduced frequency avoids the earlier HRV dip.</div>
     <div class="tip"><b>Glutathione:</b> flex Sat/Sun based on drinking load — heavier night gets the dose the next morning.</div>
     <div class="tip"><b>Site rotation:</b> clockwise around the navel for all SubQ.</div>
-    <div class="tip"><b>Wednesday</b> heavy day: NAD+, Tesa/Ipa, BPC/TB (if pin day) AM, Reta + Epithalon (if in cycle) PM. (MOTS-C stopped, GHK-Cu/KPV on break — add back if/when it resumes.)</div>
+    <div class="tip"><b>Wednesday</b> heavy day: NAD+, Tesa/Ipa, BPC/TB (if pin day) AM, Reta + Epithalon (if in cycle) PM. (MOTS-C stopped, GHK-Cu/KPV nightly in PM since Oct 28.)</div>
   </div>
 </div>
 
@@ -213,7 +213,8 @@
   const MOTS={key:"mots",name:"MOTS-C",accent:"am",units:"10u",meta:"0.5mg = 0.1mL · 5mg/mL · fasted"};
   const TESA ={key:"tesa", name:"Tesa / Ipa",accent:"am",units:"7.5u",meta:"~0.975mg Tesa + 225mcg Ipa = 0.075mL · fasted AM"};
   const TESA_RESTART=new Date(2026,9,22);
-  const GHK ={key:"ghk", name:"GHK-Cu / KPV",accent:"pm",units:"8u",meta:"GHK 1.6mg + KPV 320mcg = 0.08mL · nightly"};
+  const GHK_RESTART=new Date(2026,9,28);
+  const GHK ={key:"ghk", name:"GHK-Cu / KPV",accent:"pm",units:"8u",meta:"GHK ~1.69mg + KPV ~670mcg = 0.08mL · nightly (new Crush vial)"};
 
   // BPC-157 & TB-500 — split standalone, phased. Loading Aug 17–Sep 20, maintenance Sep 21+
   const LOAD_START = new Date(2026,7,17), LOAD_END = new Date(2026,8,21);
@@ -302,7 +303,7 @@
     if(isAraDay(dt)) am.push(araCard(dt));
     if(isSun) am.push(GLUT);
     const pm=[]; if(isBpcPmDay(dt)) pm.push(bpcCard(dt,"pm"));
-    if(isWed) pm.push(retaCard(dt)); if(isEpiDay(dt)) pm.push(epiCard()); /* GHK-Cu/KPV on break since Oct 11 — resume via pm.push(GHK) */
+    if(isWed) pm.push(retaCard(dt)); if(isEpiDay(dt)) pm.push(epiCard()); if(dt>=GHK_RESTART) pm.push(GHK); // on break Oct 11–27, restarted Oct 28 (Crush 70mg, mix 2.5mL)
     return {am,pm};
   }
 
