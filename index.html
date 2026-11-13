@@ -138,8 +138,8 @@
     </div>
     <div class="info-card">
       <div class="nm">BPC-157 (standalone) <span class="tag eod">phased</span></div>
-      <div class="recon">2mL BacWater → 5mg/mL</div>
-      <div class="det">Loading (Aug 17–Sep 20): 500mcg = 0.1mL = <b>10u</b>, AM + PM daily. Maintenance (Sep 21+): 500mcg = <b>10u</b>, EOD. 10mg vial ~10 days loading / ~20 days maintenance.</div>
+      <div class="recon">2mL BacWater → 5mg/mL (10mg vial = 20 doses)</div>
+      <div class="det"><b>Quad injury block (Nov 12–28):</b> 500mcg = 10u subQ near the quad (not into muscle), AM daily; PM dose optional, only if 7-day HRV holds (BID dipped HRV before). Step down to EOD maintenance Nov 29 until pain-free. 3 new vials in hand; mix one at a time. Loading (Aug 17–Sep 20): 500mcg = 0.1mL = <b>10u</b>, AM + PM daily. Maintenance (Sep 21+): 500mcg = <b>10u</b>, EOD. 10mg vial ~10 days loading / ~20 days maintenance.</div>
     </div>
     <div class="info-card">
       <div class="nm">TB-500 (standalone) <span class="tag eod">phased</span></div>
@@ -206,15 +206,26 @@
   // BPC-157 & TB-500 — split standalone, phased. Loading Aug 17–Sep 20, maintenance Sep 21+
   const LOAD_START = new Date(2026,7,17), LOAD_END = new Date(2026,8,21);
   function isLoading(dt){ return dt>=LOAD_START && dt<LOAD_END; }
+  // Quad strain (Nov 7) — injury block Nov 12–28: 500mcg AM daily; PM 500mcg optional only if HRV holding
+  const INJ_START=new Date(2026,10,12), INJ_END=new Date(2026,10,29);
+  function isInjury(dt){ return dt>=INJ_START && dt<INJ_END; }
   function bpcCard(dt,slot){
+    if(isInjury(dt)){
+      const first=(dt.getTime()===INJ_START.getTime());
+      const opt=(slot==="pm" && !first);
+      return {key:"bpc"+slot,name:"BPC-157 (quad)",accent:"am",units:"10u",
+        meta:"500mcg = 0.1mL · near quad, subQ not muscle · "+(opt?"PM optional, only if HRV holding":(slot==="pm"?"first dose tonight":"injury block, AM")),
+        tag:"daily"};
+    }
     const loading=isLoading(dt);
     return {key:"bpc"+slot,name:"BPC-157",accent:"am",units:"10u",
       meta: loading ? `500mcg = 0.1mL · loading, ${slot.toUpperCase()}` : "500mcg = 0.1mL · maintenance, EOD",
       tag: loading ? "daily" : "eod"};
   }
-  function isBpcPmDay(dt){ return isLoading(dt); }          // loading: AM+PM daily
+  function isBpcPmDay(dt){ return isLoading(dt) || isInjury(dt); }          // loading: AM+PM daily
   function isBpcAmDay(dt){
     if(isLoading(dt)) return true;                          // loading: AM dose daily
+    if(isInjury(dt)) return dt>INJ_START;                   // injury block: AM daily from Nov 13
     const days=Math.round((dt-LOAD_END)/86400000);          // maintenance: EOD from load-end
     return days>=0 && days%2===0;
   }
